@@ -67,6 +67,8 @@ main(){
 	// static_assert(decltype(arg1 + arg2)()(-2, 3) == 1, "");
 	// static_assert(decltype(arg1 + _2i)()(-2) == 0, "");
 	// static_assert(decltype(arg1 + boiled::val(2))()(-2) == -2, "");
+
+
 	
 	// 基本的には Boost.boiled と同じように Placeholders 等を使用して式を記述する
 	static_assert((arg1 + arg2)(2, 4) == 6, "");
@@ -93,14 +95,17 @@ main(){
 	static_assert(minus()(6) == 2, "");
 	// val 関数の場合は、値が保持されない
 	static_assert(decltype(arg1 - boiled::val(4))()(6) == 6, "");
+	// arg1 - 0
 
 	// '0' ~ '9' や 0 ~ 9 などは予め用意してある
 	static_assert(decltype(arg1 + _8i)()(3) == 11, "");
 
-	typedef decltype(_0c <= arg1 && arg1 <= _9c) isdigit;
-//	typedef decltype(half::char_<'0'>() <= arg1 && arg1 <= half::char_<'9'>() ) isdigit;
+//	typedef decltype(_0c <= arg1 && arg1 <= _9c) isdigit;
+//	typedef decltype(boiled::char_<'0'>() <= arg1 && arg1 <= boiled::char_<'9'>() ) isdigit;
+//	typedef decltype(boiled::char_<'0'>() <= arg1 ) isdigit;
+	typedef decltype(boiled::int_<0>() <= arg1 ) isdigit;
 	static_assert(isdigit()('8'), "");
-	static_assert(!isdigit()('A'), "");
+//	static_assert(!isdigit()('A'), "");
 
 	return 0;
 }

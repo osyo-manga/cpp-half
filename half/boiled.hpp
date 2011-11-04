@@ -15,19 +15,21 @@
 #define HALF_BOILED_H
 
 #include "./config.hpp"
+#include "./utility.hpp"
 #include <tuple>
-
+#include <utility>
 
 namespace half{
 
 namespace boiled{
 
+
 template<std::size_t N>
 struct placeholder{
 	template<typename ...Args>
 	constexpr typename std::tuple_element<N, std::tuple<Args...>>::type
-	operator ()(Args... args){
-		return std::get<N>(std::make_tuple(args...));
+	operator ()(Args&&... args){
+		return std::get<N>(std::tuple<Args...>(forward<Args>(args)...));
 	}
 };
 
@@ -49,7 +51,7 @@ namespace arg_names{
 template<typename T, T Value>
 struct integral_constant{
 	template<typename ...Args>
-	constexpr T operator ()(Args...) const{
+	constexpr T operator ()(Args&&...) const{
 		return Value;
 	}
 };
@@ -153,7 +155,7 @@ namespace char_values{
 template<typename T>
 struct val_impl{
 	template<typename ...args>
-	constexpr T operator ()(args...) const{
+	constexpr T operator ()(args&&...) const{
 		return value;
 	}
 	T value;
@@ -161,7 +163,7 @@ struct val_impl{
 
 template<typename T>
 constexpr val_impl<T>
-val(T t){
+val(T&& t){
 	return {{ t }};
 }
 
@@ -169,8 +171,12 @@ template<typename T0, typename T1>
 struct plus{
 	template<typename ...Args>
 	constexpr auto
-	operator ()(Args... args)->decltype(T0()(args...) + T1()(args...)) const{
-		return t0(args...) + t1(args...);
+	operator ()(Args&&... args)
+	->decltype(
+		declval<T0>()(forward<Args>(args)...)
+	  + declval<T1>()(forward<Args>(args)...)
+	 ) const{
+		return t0(forward<Args>(args)...) + t1(forward<Args>(args)...);
 	}
 	T0 t0;
 	T1 t1;
@@ -186,8 +192,12 @@ template<typename T0, typename T1>
 struct minus{
 	template<typename ...Args>
 	constexpr auto
-	operator ()(Args... args)->decltype(T0()(args...) - T1()(args...)) const{
-		return t0(args...) - t1(args...);
+	operator ()(Args&&... args)
+	->decltype(
+		declval<T0>()(forward<Args>(args)...)
+	  - declval<T1>()(forward<Args>(args)...)
+	 ) const{
+		return t0(forward<Args>(args)...) - t1(forward<Args>(args)...);
 	}
 	T0 t0;
 	T1 t1;
@@ -203,8 +213,12 @@ template<typename T0, typename T1>
 struct multiple{
 	template<typename ...Args>
 	constexpr auto
-	operator ()(Args... args)->decltype(T0()(args...) - T1()(args...)) const{
-		return t0(args...) * t1(args...);
+	operator ()(Args&&... args)
+	->decltype(
+		declval<T0>()(forward<Args>(args)...)
+	  * declval<T1>()(forward<Args>(args)...)
+	 ) const{
+		return t0(forward<Args>(args)...) * t1(forward<Args>(args)...);
 	}
 	T0 t0;
 	T1 t1;
@@ -220,8 +234,12 @@ template<typename T0, typename T1>
 struct division{
 	template<typename ...Args>
 	constexpr auto
-	operator ()(Args... args)->decltype(T0()(args...) - T1()(args...)) const{
-		return t0(args...) / t1(args...);
+	operator ()(Args&&... args)
+	->decltype(
+		declval<T0>()(forward<Args>(args)...)
+	  / declval<T1>()(forward<Args>(args)...)
+	 ) const{
+		return t0(forward<Args>(args)...) / t1(forward<Args>(args)...);
 	}
 	T0 t0;
 	T1 t1;
@@ -229,7 +247,7 @@ struct division{
 
 template<typename T0, typename T1>
 constexpr division<T0, T1>
-operator /(T0 t0, T1 t1){
+operator /(T0&& t0, T1&& t1){
 	return { t0, t1 };
 }
 
@@ -237,8 +255,8 @@ template<typename T0, typename T1>
 struct less_equal{
 	template<typename ...Args>
 	constexpr bool
-	operator ()(Args... args) const{
-		return t0(args...) <= t1(args...);
+	operator ()(Args&&... args) const{
+		return t0(forward<Args>(args)...) <= t1(forward<Args>(args)...);
 	}
 	T0 t0;
 	T1 t1;
@@ -254,8 +272,8 @@ template<typename T0, typename T1>
 struct and_{
 	template<typename ...Args>
 	constexpr bool
-	operator ()(Args... args) const{
-		return t0(args...) && t1(args...);
+	operator ()(Args&&... args) const{
+		return t0(forward<Args>(args)...) && t1(forward<Args>(args)...);
 	}
 	T0 t0;
 	T1 t1;
@@ -271,8 +289,11 @@ template<typename Cond, typename Then, typename Else>
 struct if_else_impl{
 	template<typename ...Args>
 	constexpr auto
-	operator ()(Args... args)->decltype(Then()(args...)) const{
-		return cond(args...) ? then(args...) :	else_(args...);
+	operator ()(Args&&... args)
+	->decltype(Then()(forward<Args>(args)...)) const{
+		return cond (forward<Args>(args)...)
+			 ? then (forward<Args>(args)...)
+			 : else_(forward<Args>(args)...);
 	}
 	Cond cond;
 	Then then;
