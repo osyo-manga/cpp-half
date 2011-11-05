@@ -1,5 +1,5 @@
 //
-// kmt-library
+// half-library
 //
 // Copyright (c) 2011 
 // osyo-manga : http://d.hatena.ne.jp/osyo-manga/
@@ -67,10 +67,8 @@ main(){
 	// static_assert(decltype(arg1 + arg2)()(-2, 3) == 1, "");
 	// static_assert(decltype(arg1 + _2i)()(-2) == 0, "");
 	// static_assert(decltype(arg1 + boiled::val(2))()(-2) == -2, "");
-
-
 	
-	// 基本的には Boost.boiled と同じように Placeholders 等を使用して式を記述する
+	// 基本的には Boost.Lambd と同じように Placeholders 等を使用して式を記述する
 	static_assert((arg1 + arg2)(2, 4) == 6, "");
 	// 値を記述する場合は、val 関数を使用
 	static_assert((arg1 + boiled::val(3))(6) == 9, "");
