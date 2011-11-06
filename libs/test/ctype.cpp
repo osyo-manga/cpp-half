@@ -13,21 +13,17 @@
 //
 #include <half/ctype.hpp>
 
+
 int
 main(){
-	static_assert(ce::isdigit('0'), "");
-	static_assert(ce::isdigit('9'), "");
-	static_assert(ce::isdigit('5'), "");
-	static_assert(!ce::isdigit('a'), "");
+	static_assert(half::isdigit('0'), "");
+	static_assert(half::isdigit('9'), "");
+	static_assert(half::isdigit('5'), "");
+	static_assert(!half::isdigit('a'), "");
 
-	static_assert(ce::isupper('V'), "");
-	static_assert(!ce::isupper('a'), "");
-	static_assert(!ce::isupper('0'), "");
-	
-	static_assert(ce::strtol("52", 0) == 52, "");
-	static_assert(ce::strtol("0377", 0) == 255, "");
-	static_assert(ce::strtol("0xff", 0) == 255, "");
-	static_assert(ce::strtol("0xFF", 0) == 255, "");
+	static_assert(half::isupper('V'), "");
+	static_assert(!half::isupper('a'), "");
+	static_assert(!half::isupper('0'), "");
 
 	return 0;
 }
