@@ -57,9 +57,35 @@ struct integral_constant{
 };
 
 template<int N>
-struct int_ : integral_constant<int, N>{};
+struct int_ : integral_constant<int, N>{
+	constexpr int_<-N>
+	operator -() const{
+		return int_<-N>{};
+	}
+};
+
+
+namespace detail{
+
+	template<std::size_t acc, char ...cs>
+	struct atoi_impl
+		: std::integral_constant<int, acc>{};
+
+	template<std::size_t acc, char c, char ...cs>
+	struct atoi_impl<acc, c, cs...>
+		: atoi_impl<(acc * 10) + (c - '0'), cs...>{};
+
+}  // namespace detail
+
+template<char ...cs>
+constexpr
+int_<detail::atoi_impl<0, cs...>::value>
+operator "" _i(){
+	return int_<detail::atoi_impl<0, cs...>::value>{};
+}
 
 namespace int_values{
+
 	constexpr int_<0> _0i{};
 	constexpr int_<1> _1i{};
 	constexpr int_<2> _2i{};
@@ -143,6 +169,87 @@ namespace char_values{
 	constexpr char_<'Z'> Zc{};
 
 };
+
+
+namespace detail{
+
+constexpr std::size_t
+pow(std::size_t n, std::size_t m){
+	return m == 0 ? 1
+		 : n * pow(n, m-1);
+}
+
+template<char C>
+struct ctoi : std::integral_constant<int, C - '0'>{};
+
+template<int acc, char ...cs>
+struct ratio_atoi_impl
+	: std::integral_constant<int, acc>{};
+
+template<int acc, char c, char ...cs>
+struct ratio_atoi_impl<acc, c, cs...>
+	: ratio_atoi_impl<c == '.' ? acc : (acc * 10) + (c - '0'), cs...>{};
+
+template<char ...cs>
+struct num_impl : ratio_atoi_impl<0, cs...>{};
+
+
+template<char ...cs>
+struct den_impl;
+
+template<char c, char ...cs>
+struct den_impl<c, cs...> : std::conditional<
+	c == '.',
+	std::integral_constant<std::size_t, pow(10, sizeof...(cs))>,
+	den_impl<cs...>
+>::type{};
+
+
+template<>
+struct den_impl<> : std::integral_constant<std::size_t, 0>{};
+
+template<char... cs>
+struct num : detail::num_impl<cs...>{};
+
+
+template<char... cs>
+struct den : detail::den_impl<cs...>{};
+
+}  // namespace detail
+
+
+template<int Num, std::size_t Den>
+struct ratio{
+	static int const num = Num;
+	static std::size_t const den = Den;
+	constexpr ratio<-Num, Den>
+	operator -() const{
+		return ratio<-Num, Den>{};
+	}
+	constexpr operator float() const{
+		return float(Num) / Den;
+	}
+};
+
+template<typename T>
+struct float_{
+	constexpr operator float() const{
+		return T();
+	}
+	template<typename ...Args>
+	constexpr float
+	operator ()(Args&&...) const{
+		return *this;
+	}
+};
+
+
+template<char... cs>
+constexpr float_<ratio<detail::num<cs...>::value, detail::den<cs...>::value>>
+operator "" _f(){
+	return float_<ratio<detail::num<cs...>::value, detail::den<cs...>::value>>{};
+}
+
 
 // template<typename T>
 // struct val{
@@ -305,6 +412,7 @@ constexpr if_else_impl<Cond, Then, Else>
 if_else(Cond cond, Then then, Else else_){
 	return { cond, then, else_ };
 }
+
 
 }  // namespace boiled
 

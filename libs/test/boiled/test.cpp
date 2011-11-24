@@ -33,40 +33,40 @@ ctoi(char c){
 int
 main(){
 	namespace boiled = half::boiled;
+	using namespace boiled;
+	using boiled::operator "" _i;
 	using namespace boiled::arg_names;
-	using namespace boiled::int_values;
 	using namespace boiled::char_values;
 
-	// static_assert(half::placeholder<0>()(1, 2) == 1, "");
-	// static_assert(half::plus<arg1T, arg2T>()(1, 2) == 3, "");
-	// 
-	// static_assert(arg1(2, 3) == 2, "");
-	// static_assert(half::int_<3>()(2, 1) == 3, "");
-	// static_assert((arg1 + arg2)(2, 3) == 5, "");
-	// static_assert((arg1 + arg2 + _1i)(3, 2) == 6, "");
-	// static_assert((arg1 + arg2 + arg3)(3, 2, 3) == 8, "");
-	// 
-	// static_assert((arg1 + half::val(2))(3) == 5, "");
+	static_assert(boiled::placeholder<0>()(1, 2) == 1, "");
+	static_assert(boiled::plus<arg1T, arg2T>()(1, 2) == 3, "");
+	
+	static_assert(arg1(2, 3) == 2, "");
+	static_assert(boiled::int_<3>()(2, 1) == 3, "");
+	static_assert((arg1 + arg2)(2, 3) == 5, "");
+	static_assert((arg1 + arg2 + 1_i)(3, 2) == 6, "");
+	static_assert((arg1 + arg2 + arg3)(3, 2, 3) == 8, "");
+	
+	static_assert((arg1 + boiled::val(2))(3) == 5, "");
 
-	// static_assert((arg1 - arg2)(3, 1) == 2, "");
-	// static_assert(half::if_else(arg1, arg2 + arg2, arg2)(true, 1) == 2, "");
-	// static_assert(half::if_else(arg1, arg2 + arg2, arg2)(false, 1) == 1, "");
-	// 
-	// // typedef decltype(_0c <= arg1 && arg1 <= _9c) isdigit;
-	// // static_assert(isdigit()('8'), "");
-	// // static_assert(!isdigit()('A'), "");
-	// 
-	// static_assert(ctoi('4') == 4, "");
-	// 
-	// static_assert(arg1(1, 2) == 1, "");
+	static_assert((arg1 - arg2)(3, 1) == 2, "");
+	static_assert(boiled::if_else(arg1, arg2 + arg2, arg2)(true, 1) == 2, "");
+	static_assert(boiled::if_else(arg1, arg2 + arg2, arg2)(false, 1) == 1, "");
+	
+	// typedef decltype(_0c <= arg1 && arg1 <= _9c) isdigit;
+	// static_assert(isdigit()('8'), "");
+	// static_assert(!isdigit()('A'), "");
+	
+	static_assert(ctoi('4') == 4, "");
+	static_assert(arg1(1, 2) == 1, "");
 
-	// char c = '6';
-	// std::cout << ctoi(c) << std::endl;
-	// std::cout << (arg1 + _3i)(2, 3) << std::endl;
-	// 
-	// static_assert(decltype(arg1 + arg2)()(-2, 3) == 1, "");
-	// static_assert(decltype(arg1 + _2i)()(-2) == 0, "");
-	// static_assert(decltype(arg1 + boiled::val(2))()(-2) == -2, "");
+// 	char c = '6';
+// 	std::cout << ctoi(c) << std::endl;
+// 	std::cout << (arg1 + 3_i)(2, 3) << std::endl;
+	
+	static_assert(decltype(arg1 + arg2)()(-2, 3) == 1, "");
+	static_assert(decltype(arg1 + 2_i)()(-2) == 0, "");
+	static_assert(decltype(arg1 + boiled::val(2))()(-2) == -2, "");
 	
 	// 基本的には Boost.Lambd と同じように Placeholders 等を使用して式を記述する
 	static_assert((arg1 + arg2)(2, 4) == 6, "");
@@ -96,14 +96,14 @@ main(){
 	// arg1 - 0
 
 	// '0' ~ '9' や 0 ~ 9 などは予め用意してある
-	static_assert(decltype(arg1 + _8i)()(3) == 11, "");
+	static_assert(decltype(arg1 + 8_i)()(3) == 11, "");
 
-//	typedef decltype(_0c <= arg1 && arg1 <= _9c) isdigit;
-//	typedef decltype(boiled::char_<'0'>() <= arg1 && arg1 <= boiled::char_<'9'>() ) isdigit;
-//	typedef decltype(boiled::char_<'0'>() <= arg1 ) isdigit;
-	typedef decltype(boiled::int_<0>() <= arg1 ) isdigit;
-	static_assert(isdigit()('8'), "");
-//	static_assert(!isdigit()('A'), "");
+	typedef decltype(_0c <= arg1 && arg1 <= _9c) isdigit;
+	static_assert(!isdigit()('A'), "");
+	
+	static_assert(0.25_f == 0.25f, "");
+	static_assert(decltype(0.25_f + arg1)()(0.75f) == 1.0f, "");
+
 
 	return 0;
 }
