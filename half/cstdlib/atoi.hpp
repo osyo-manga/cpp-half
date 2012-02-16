@@ -34,7 +34,7 @@ inline
 HALF_CONSTEXPR Char const*
 atoi_remove_space(Char const* s){
 	return s[0] != Char(' ') ? s
-		 : remove_space(s+1);
+		 : atoi_remove_space(s+1);
 }
 
 template<typename Char>
@@ -67,7 +67,7 @@ template<typename Char>
 inline
 HALF_CONSTEXPR int
 atoi(Char const* s){
-	return detail::ctoi(s);
+	return detail::atoi(s);
 }
 
 } // namespace half
